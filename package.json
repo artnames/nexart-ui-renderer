@@ -1,0 +1,44 @@
+{
+  "name": "@nexart/ui-renderer",
+  "version": "0.2.1",
+  "description": "Declarative system authoring SDK for NexArt Protocol (non-canonical, preview only)",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "nexart",
+    "generative-art",
+    "canvas",
+    "browser",
+    "declarative",
+    "protocol",
+    "authoring",
+    "preview"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artnames/nexart-ui-renderer.git"
+  },
+  "author": "NexArt",
+  "publishConfig": {
+    "access": "public"
+  }
+}
