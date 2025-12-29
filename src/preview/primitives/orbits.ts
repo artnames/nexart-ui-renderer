@@ -2,7 +2,7 @@
  * Orbits Primitive Renderer
  */
 
-import type { OrbitsElement } from '../../types';
+import type { OrbitsElement } from '../../types.js';
 
 export function renderOrbits(
   ctx: CanvasRenderingContext2D,

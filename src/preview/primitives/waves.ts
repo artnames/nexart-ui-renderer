@@ -2,7 +2,7 @@
  * Waves Primitive Renderer
  */
 
-import type { WavesElement } from '../../types';
+import type { WavesElement } from '../../types.js';
 
 export function renderWaves(
   ctx: CanvasRenderingContext2D,

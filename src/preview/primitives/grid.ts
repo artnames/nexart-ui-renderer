@@ -2,7 +2,7 @@
  * Grid Primitive Renderer
  */
 
-import type { GridElement } from '../../types';
+import type { GridElement } from '../../types.js';
 
 export function renderGrid(
   ctx: CanvasRenderingContext2D,

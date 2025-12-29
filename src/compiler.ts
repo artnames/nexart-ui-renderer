@@ -4,8 +4,8 @@
  * Compiles validated systems into canonical protocol-compatible JSON.
  */
 
-import type { NexArtSystem, SystemElement } from './types';
-import { validateSystem } from './system';
+import type { NexArtSystem, SystemElement } from './types.js';
+import { validateSystem } from './system.js';
 
 export interface CompiledSystem {
   protocol: 'nexart';

@@ -11,7 +11,7 @@ import type {
   ValidationResult,
   BackgroundConfig,
   MotionConfig,
-} from './types';
+} from './types.js';
 
 const CURRENT_VERSION = '0.2';
 

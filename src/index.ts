@@ -21,15 +21,15 @@
  * - Building platforms, tools, and integrations
  */
 
-export { createSystem, validateSystem } from './system';
-export { compileSystem, serializeSystem } from './compiler';
-export { previewSystem } from './preview/renderer';
+export { createSystem, validateSystem } from './system.js';
+export { compileSystem, serializeSystem } from './compiler.js';
+export { previewSystem } from './preview/renderer.js';
 export {
   getCapabilities,
   getPrimitiveTypes,
   getMotionSources,
   getBackgroundTextures,
-} from './capabilities';
+} from './capabilities.js';
 
 export type {
   NexArtSystemInput,
@@ -45,13 +45,13 @@ export type {
   MotionConfig,
   PreviewOptions,
   ValidationResult,
-} from './types';
+} from './types.js';
 
 export type {
   Capabilities,
   PrimitiveCapability,
   ParameterSpec,
-} from './capabilities';
+} from './capabilities.js';
 
 export const SDK_VERSION = '0.2.1';
 export const PROTOCOL_VERSION = '0.2';

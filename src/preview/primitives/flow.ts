@@ -2,7 +2,7 @@
  * Flow Field Primitive Renderer
  */
 
-import type { FlowFieldElement } from '../../types';
+import type { FlowFieldElement } from '../../types.js';
 
 export function renderFlowField(
   ctx: CanvasRenderingContext2D,

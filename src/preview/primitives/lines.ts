@@ -2,7 +2,7 @@
  * Lines Primitive Renderer
  */
 
-import type { LinesElement } from '../../types';
+import type { LinesElement } from '../../types.js';
 
 export function renderLines(
   ctx: CanvasRenderingContext2D,

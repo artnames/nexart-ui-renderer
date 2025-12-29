@@ -2,7 +2,7 @@
  * Dots Primitive Renderer
  */
 
-import type { DotsElement } from '../../types';
+import type { DotsElement } from '../../types.js';
 
 export function renderDots(
   ctx: CanvasRenderingContext2D,

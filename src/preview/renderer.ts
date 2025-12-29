@@ -5,13 +5,13 @@
  * This is NOT canonical output - for preview/exploration only.
  */
 
-import type { NexArtSystem, PreviewOptions } from '../types';
-import { renderDots } from './primitives/dots';
-import { renderLines } from './primitives/lines';
-import { renderWaves } from './primitives/waves';
-import { renderGrid } from './primitives/grid';
-import { renderFlowField } from './primitives/flow';
-import { renderOrbits } from './primitives/orbits';
+import type { NexArtSystem, PreviewOptions } from '../types.js';
+import { renderDots } from './primitives/dots.js';
+import { renderLines } from './primitives/lines.js';
+import { renderWaves } from './primitives/waves.js';
+import { renderGrid } from './primitives/grid.js';
+import { renderFlowField } from './primitives/flow.js';
+import { renderOrbits } from './primitives/orbits.js';
 
 function createPRNG(seed: number): () => number {
   let state = seed;
