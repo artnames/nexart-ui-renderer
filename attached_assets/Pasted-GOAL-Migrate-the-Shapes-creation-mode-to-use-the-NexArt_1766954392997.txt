@@ -1,0 +1,104 @@
+GOAL
+Migrate the Shapes creation mode to use the NexArt Code Mode runtime exclusively, achieving HARD protocol enforcement.
+
+Shapes must behave like SoundArt and Noise:
+- One deterministic runtime
+- No legacy canvas rendering
+- No silent fallbacks
+- Fully protocol-native systems
+
+DO NOT expand scope beyond Shapes.
+
+---
+
+CURRENT STATE (CONTEXT)
+- ShapesCreatePage.tsx uses ArtCanvas
+- ArtCanvas renders shapes imperatively to a canvas
+- Shapes mutate canvas state directly on user interaction
+- This bypasses the NexArt protocol + Code Mode engine
+
+SoundArt and Noise have already been successfully migrated and enforced.
+Shapes is the last remaining non-protocol mode.
+
+---
+
+REQUIRED END STATE
+
+1. **Rendering**
+- All Shapes output must be rendered via the NexArt Code Mode runtime
+- Shapes must compile into a valid NexArt system
+- Rendering must go through the same Code Mode engine used by SoundArt & Noise
+
+2. **System Model**
+- Each Shapes artwork must be represented as:
+  - seed
+  - background
+  - element list (circles, squares, triangles)
+  - deterministic placement rules
+- No direct canvas drawing from React components
+
+3. **User Interaction**
+- User actions (click to add shape, adjust settings) must:
+  - Update a system description
+  - Re-render via Code Mode
+- NOT draw directly to canvas
+
+4. **Protocol Enforcement**
+- Remove or deprecate legacy ArtCanvas rendering paths
+- Add enforcement logging:
+  `[Shapes] Protocol enforcement: HARD | renderedVia: codemode`
+- No fallback to legacy renderer under any circumstance
+
+5. **Determinism**
+- Placement randomness must be seeded
+- Same seed + same inputs = same output
+- Use the same seeded RNG strategy as Code Mode
+
+6. **Saving**
+- Saved artworks must store:
+  - The canonical system definition
+  - NOT a canvas snapshot as the source of truth
+- Preview images can be derived, but system is primary
+
+---
+
+IMPLEMENTATION GUIDELINES
+
+- Create `shapes-engine.ts` under Code Mode (mirroring noise-engine / soundart-engine)
+- Define a `buildShapesSystem(settings, shapes, seed)` function
+- Convert each shape into a system primitive:
+  - type: "circle" | "square" | "triangle"
+  - position, size, rotation, color, stroke
+- Update ShapesCreatePage.tsx to:
+  - Build system
+  - Call Code Mode renderer
+  - Remove direct drawing logic
+
+---
+
+EXPLICITLY DO NOT
+- Do NOT introduce new UI features
+- Do NOT change Shapes UX
+- Do NOT add WebGL
+- Do NOT keep legacy rendering as a fallback
+- Do NOT mix Code Mode and imperative canvas drawing
+
+---
+
+DELIVERABLES
+
+- Shapes rendered exclusively via Code Mode
+- Legacy renderer deprecated or removed
+- Enforcement logs visible in console
+- Shapes added to protocol enforcement documentation
+- One clear commit: "Enforce Code Mode rendering for Shapes"
+
+---
+
+SUCCESS CRITERIA
+
+When interacting with Shapes:
+- Console shows: `[Shapes] Protocol enforcement: HARD | renderedVia: codemode`
+- No legacy renderer code path is reachable
+- Shapes behave deterministically
+- Shapes is now a first-class NexArt protocol mode

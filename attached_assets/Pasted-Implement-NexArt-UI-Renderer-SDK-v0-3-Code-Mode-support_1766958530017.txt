@@ -1,0 +1,145 @@
+Implement NexArt UI Renderer SDK v0.3 (Code Mode support)
+
+Context
+
+You are working on the npm package @nexart/ui-renderer.
+This SDK already supports declarative generative systems (dots, lines, flow, etc.).
+
+NexArt now requires Code Mode support in the SDK, using the exact same runtime and determinism guarantees as nexart.xyz.
+
+This is a protocol-level change. Do not invent new renderers or abstractions.
+
+⸻
+
+🎯 Goal
+
+Extend @nexart/ui-renderer to support Code Mode systems, so external builders (Replit, Lovable, Cursor) can render canonical NexArt Code Mode sketches.
+
+The SDK must:
+	•	Execute raw Code Mode sketches
+	•	Use the same Code Mode runtime as nexart.xyz
+	•	Preserve determinism, seeding, and loop behavior
+	•	Integrate cleanly into createSystem() and previewSystem()
+	•	Introduce no parallel rendering engine
+
+⸻
+
+🧠 Critical Constraints (DO NOT VIOLATE)
+
+❌ Do NOT:
+	•	Create a new sketch renderer
+	•	Create a SketchElement, PreviewRenderer, or custom lifecycle
+	•	Re-implement p5 / randomness / noise
+	•	Execute sketches outside the Code Mode runtime
+	•	Add silent fallbacks
+
+✅ ONLY:
+	•	Reuse the existing NexArt Code Mode runtime
+	•	Extend the canonical system schema
+	•	Route rendering through the same execution path as nexart.xyz
+
+⸻
+
+🧩 Canonical System Shape (MUST MATCH)
+
+Add support for this system type:
+
+type CodeSystem = {
+  type: "code";
+  source: string;              // verbatim sketch code
+  mode: "static" | "loop";
+  width: number;
+  height: number;
+  seed?: number;
+  totalFrames?: number;        // required if mode === "loop"
+};
+
+No other fields.
+No wrappers.
+No interpretation.
+
+⸻
+
+🔧 Implementation Tasks
+
+1️⃣ Extend system types
+	•	Update types to include CodeSystem
+	•	Update validation to enforce:
+	•	source is required
+	•	mode === "loop" requires totalFrames
+
+⸻
+
+2️⃣ Integrate Code Mode runtime
+	•	Import the existing Code Mode runtime used by nexart.xyz
+	•	Reuse:
+	•	seeded RNG
+	•	seeded noise
+	•	p5-runtime
+	•	loop/static execution logic
+	•	Do not modify runtime behavior
+
+⸻
+
+3️⃣ Extend createSystem()
+	•	Accept { type: "code", ... }
+	•	Validate but do not transform the sketch
+	•	Store source verbatim
+
+⸻
+
+4️⃣ Extend previewSystem()
+	•	Detect system.type === "code"
+	•	Route to renderCodeModeSystem(system, canvas)
+	•	This function must:
+	•	Create Code Mode runtime
+	•	Inject the sketch verbatim
+	•	Apply seed deterministically
+	•	Run in static or loop mode
+	•	No try/catch fallbacks
+	•	Errors must surface
+
+⸻
+
+5️⃣ Acceptance Test (MANDATORY)
+Verify that this works unchanged:
+
+const system = createSystem({
+  type: "code",
+  mode: "loop",
+  width: 1950,
+  height: 2400,
+  totalFrames: 120,
+  source: `
+    function setup() { noFill(); }
+    function draw() { background(246,245,242); }
+  `
+});
+
+previewSystem(system, canvas);
+
+The output must match nexart.xyz Code Mode behavior.
+
+⸻
+
+📦 Versioning
+	•	Bump version to v0.3.0
+	•	Update package exports if needed
+	•	Update README with one Code Mode example
+	•	Do not remove existing primitives
+
+⸻
+
+📜 Definition of Done
+
+✅ SDK renders Code Mode sketches
+✅ Deterministic output
+✅ No legacy or parallel renderer
+✅ One unified runtime
+✅ Ready for npm publish
+
+⸻
+
+Start with types + runtime integration first.
+Do not move on until Code Mode rendering is pixel-correct.
+

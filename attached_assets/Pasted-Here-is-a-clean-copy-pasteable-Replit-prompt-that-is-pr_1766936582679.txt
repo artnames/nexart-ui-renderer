@@ -1,0 +1,162 @@
+Here is a clean, copy-pasteable Replit prompt that is precise enough to get the job done without architectural drift, and aligned with the audit you shared.
+
+You can paste this as-is into Replit.
+
+⸻
+
+✅ Replit Prompt — Final SoundArt Protocol Enforcement
+
+Context
+
+We have completed a full migration of SoundArt rendering into the NexArt Code Mode engine.
+All 14 active SoundArt styles already render deterministically via Code Mode.
+
+However, a legacy Canvas2D fallback path still exists and must be removed to achieve full protocol compliance.
+
+Your task is to finish the migration by enforcing Code Mode as the only rendering path for SoundArt.
+
+⸻
+
+🎯 Goal
+
+Make SoundArt 100% protocol-compliant by:
+	•	Removing all runtime fallbacks to legacy Canvas2D rendering
+	•	Ensuring every SoundArt render goes through the Code Mode engine
+	•	Preserving determinism, seeded randomness, and frozen audio inputs
+	•	Keeping legacy code temporarily (deprecated) but unreachable
+
+⸻
+
+🔧 Required Changes (Exact)
+
+1️⃣ Remove legacy fallback in render gate (CRITICAL)
+
+File
+
+client/src/pages/soundart/engine/render-via-codemode.ts
+
+Current issue
+There is a try/catch block that silently falls back to:
+
+import('./render')
+
+which renders via Canvas2D.
+
+Action
+	•	Remove the fallback entirely
+	•	Do NOT catch and downgrade errors
+	•	Code Mode must be the only execution path
+
+Replace the implementation of renderSoundArtSmart() with:
+
+export async function renderSoundArtSmart(
+  canvas: HTMLCanvasElement,
+  sound: SoundFeatures,
+  cfg: RenderCfg,
+  time?: TimeFeatures,
+  onProgress?: (progress: number) => void
+): Promise<{
+  style: SoundArtStyle;
+  mode: 'soundart';
+  soundFeatures: { duration: number; amplitude: number };
+  metadata: SoundArtMetadata;
+}> {
+  // Protocol-enforced: Code Mode only
+  const result = await renderSoundArtViaCodeMode(
+    canvas,
+    sound,
+    cfg,
+    time,
+    onProgress
+  );
+
+  return result;
+}
+
+❌ No fallback
+❌ No silent downgrade
+✅ Failure should surface clearly during development
+
+⸻
+
+2️⃣ Deprecate legacy renderer files (DO NOT DELETE YET)
+
+Add a clear deprecation header comment to the following files:
+
+client/src/pages/soundart/engine/render.ts
+client/src/pages/soundart/engine/styles_impl.ts
+client/src/pages/soundart/engine/timeFilter.ts
+client/src/pages/soundart/engine/timeFilterDynamic.ts
+
+Header to add
+
+/**
+ * @deprecated
+ * Legacy SoundArt Canvas2D renderer.
+ * SoundArt is now rendered exclusively via Code Mode.
+ * This file is retained temporarily for rollback safety and will be removed.
+ */
+
+Do not remove the files yet — just ensure they are no longer imported or executed.
+
+⸻
+
+3️⃣ Ensure render metadata reflects enforcement
+
+Where render metadata is returned, ensure:
+
+renderedVia: 'codemode'
+
+There should be no possible runtime state where:
+
+renderedVia === 'legacy'
+
+
+⸻
+
+4️⃣ Verification checklist (you must confirm)
+
+After changes, verify:
+	•	All 14 active SoundArt styles render successfully
+	•	Console logs never show "Rendered via: legacy"
+	•	Seed + same audio snapshot → identical output
+	•	Slider / “Tune your artwork” controls still affect visuals
+	•	Errors surface if Code Mode fails (no silent fallback)
+
+⸻
+
+🚫 Explicitly Do NOT
+	•	Do NOT reintroduce Canvas2D rendering
+	•	Do NOT add new fallbacks
+	•	Do NOT change SoundSnapshot structure
+	•	Do NOT alter seeded RNG or noise logic
+	•	Do NOT modify protocol schema
+
+⸻
+
+✅ Outcome
+
+After this change:
+	•	SoundArt becomes a first-class protocol mode
+	•	Rendering is fully deterministic and enforceable
+	•	NexArt can truthfully claim protocol-native audio generative art
+	•	SDKs and third-party builders inherit the same guarantees
+
+⸻
+
+🧠 Notes
+
+This is a final enforcement step, not a refactor.
+The architecture is already correct — this removes the last escape hatch.
+
+Proceed carefully and confirm each step before finalizing.
+
+⸻
+
+If you want, next I can:
+	•	Draft the public announcement text
+	•	Write the nexart.xyz update copy
+	•	Help you define the SoundArt hard-enforcement milestone
+	•	Prepare a protocol changelog entry
+
+Just say the word.

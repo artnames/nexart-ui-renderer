@@ -1,0 +1,150 @@
+You are working on the @nexart/ui-renderer SDK.
+
+Your task is to implement SUPPORT FOR BOTH:
+1) Declarative primitives (grid, lines, waves, dots, flow, etc.)
+2) Raw Code Mode sketches
+WHILE ensuring outputs are visually pleasing by default.
+
+This SDK is NOT a freeform canvas library.
+It is a GENERATIVE DESIGN SYSTEM with aesthetic guardrails.
+
+––––––––––––––––––––––––––––––
+CORE REQUIREMENTS (STRICT)
+––––––––––––––––––––––––––––––
+
+1. Add support for THREE element types:
+   
+   • primitive   → curated declarative building blocks
+   • sketch      → raw Code Mode sketch execution
+   • background  → aesthetic-first preset wrapper
+
+2. ALL rendering must:
+   • Use the NexArt Code Mode runtime
+   • Be deterministic
+   • Support looping animation
+   • Be safe for landing-page backgrounds
+
+3. NO element may bypass the Code Mode engine.
+   No direct Canvas2D, no ad-hoc p5 instances.
+
+––––––––––––––––––––––––––––––
+AESTHETIC GUARDRAILS (IMPORTANT)
+––––––––––––––––––––––––––––––
+
+The SDK must bias toward “nice” output automatically.
+
+If a user provides:
+• vague instructions
+• minimal configuration
+• only a sketch string
+
+The SDK MUST:
+• normalize scale
+• clamp density
+• restrict stroke weight
+• ensure clean looping
+• apply balanced composition defaults
+
+The goal:
+> “An AI can ask for a looping background and the result already looks good.”
+
+––––––––––––––––––––––––––––––
+ELEMENT TYPE DEFINITIONS
+––––––––––––––––––––––––––––––
+
+1️⃣ background (preferred for AI)
+
+A high-level preset wrapper that always looks good.
+
+Example:
+{
+  type: 'background',
+  preset: 'layered-waves',
+  palette: 'offwhite-dark',
+  loop: { duration: 120 }
+}
+
+Presets should internally compile to Code Mode sketches.
+
+Required presets (v1):
+• layered-waves
+• soft-noise-field
+• orbital-lines
+• flowing-stripes
+• minimal-grid
+
+2️⃣ primitive (controlled composition)
+
+Declarative blocks with SAFE ranges.
+
+Example:
+{
+  type: 'primitive',
+  name: 'waves',
+  count: 7,
+  strokeWeight: 'auto',
+  motion: 'slow'
+}
+
+Primitives must:
+• Clamp values
+• Use tasteful defaults
+• Compose well together
+
+3️⃣ sketch (advanced / explicit)
+
+Raw Code Mode sketch support.
+
+Example:
+{
+  type: 'sketch',
+  code: `function setup() { noFill(); }
+         function draw() { … }`,
+  totalFrames: 120
+}
+
+Rules:
+• Must run INSIDE Code Mode runtime
+• Must receive width, height, frameCount
+• Must be wrapped with safety normalization
+• Must not break determinism
+
+––––––––––––––––––––––––––––––
+DEFAULT VISUAL STYLE (GLOBAL)
+––––––––––––––––––––––––––––––
+
+Unless explicitly overridden:
+
+• Background: off-white (246,245,242)
+• Foreground: dark neutral gray
+• Motion: slow, sinusoidal, loop-safe
+• Density: medium
+• Composition: centered, generous margins
+
+These defaults MUST apply to sketch execution as well.
+
+––––––––––––––––––––––––––––––
+LOOPING REQUIREMENTS
+––––––––––––––––––––––––––––––
+
+• All animation must loop perfectly
+• Use normalized time:
+  t = (frameCount % totalFrames) / totalFrames
+• No unbounded randomness
+• No frame-dependent drift
+
+––––––––––––––––––––––––––––––
+OUTPUT GOAL
+––––––––––––––––––––––––––––––
+
+After this change:
+
+• A developer installs the SDK
+• Asks an AI for a looping generative background
+• Uses background / primitive / sketch elements
+• Gets a visually pleasing result immediately
+
+This SDK is an OPINIONATED renderer.
+Beauty by default > unlimited freedom.
+
+Proceed carefully and implement with clarity.

@@ -1,0 +1,194 @@
+@nexart/ui-renderer v0.2 (Authoring SDK)
+
+Goal:
+Build @nexart/ui-renderer v0.2, a browser-first, non-canonical authoring SDK that fully opens access to the NexArt engine for creation and experimentation, while preserving protocol rules and canonical execution elsewhere.
+
+⸻
+
+Core Principles (do not violate)
+	1.	This SDK does NOT render canonically
+	•	No minting
+	•	No archival guarantees
+	•	Clearly marked isCanonical = false
+	•	Preview only
+	2.	This SDK does NOT allow arbitrary drawing
+	•	No raw canvas access
+	•	No p5.js escape hatches
+	•	No user-defined rendering functions
+	•	Users author systems, not drawing code
+	3.	Canonical execution remains unchanged
+	•	Canonical rendering still happens via @nexart/codemode-sdk
+	•	This SDK only authors and previews systems
+
+⸻
+
+What this SDK MUST enable
+
+Builders and AI tools should be able to say:
+
+“Create a blue background with waves and dots”
+
+…and the SDK must express this using NexArt primitives, not custom code.
+
+⸻
+
+Required Architecture (mandatory)
+
+1️⃣ System Authoring Layer (core API)
+Provide a declarative, composable API:
+
+import { createSystem } from "@nexart/ui-renderer";
+
+const draft = createSystem({
+  seed: 29445825,
+
+  background: {
+    color: "blue",
+    texture: "noise"
+  },
+
+  elements: [
+    { type: "waves", axis: "x", amplitude: 0.4, frequency: 0.7 },
+    { type: "dots", distribution: "radial", count: 400, size: [1, 4] }
+  ],
+
+  motion: {
+    source: "time",
+    speed: 0.2
+  }
+});
+
+Rules:
+	•	Only structured primitives
+	•	No callbacks
+	•	No functions
+	•	No custom shaders
+
+⸻
+
+2️⃣ Compiler Layer (protocol alignment)
+
+import { compileSystem } from "@nexart/ui-renderer";
+
+const system = compileSystem(draft);
+
+	•	Output is protocol-shaped JSON
+	•	Deterministic
+	•	Versioned
+	•	Ready for canonical execution elsewhere
+	•	Compilation validates constraints
+
+⸻
+
+3️⃣ Preview Renderer Layer (browser only)
+
+import { previewSystem } from "@nexart/ui-renderer";
+
+const renderer = previewSystem(system, canvas, { mode: "loop" });
+renderer.start();
+
+Rules:
+	•	Browser only
+	•	Canvas/Web APIs only
+	•	Explicit disclaimer: Preview Renderer (Non-Canonical)
+	•	No guarantees of pixel-level equivalence with canonical renderer
+
+⸻
+
+Primitive Vocabulary (expandable but constrained)
+
+Implement these primitives as composable building blocks:
+	•	dots
+	•	lines
+	•	waves
+	•	grid
+	•	flowField
+	•	orbits
+
+Each primitive has typed parameters only (numbers, enums, ranges).
+
+❌ No named “styles”
+❌ No presets like "waveStyle"
+✅ Style emerges from composition
+
+⸻
+
+AI / Builder Support (very important)
+
+Expose capability discovery:
+
+import { getCapabilities } from "@nexart/ui-renderer";
+
+getCapabilities();
+
+Returns:
+	•	Supported primitives
+	•	Background options
+	•	Motion sources
+	•	Parameter ranges
+
+This is critical to prevent AI hallucination and SDK bypass.
+
+⸻
+
+Required Metadata Flags
+
+Every exported system and renderer must expose:
+
+isCanonical: false
+isArchival: false
+renderer: "@nexart/ui-renderer"
+
+
+⸻
+
+Project Structure
+
+nexart-ui-renderer/
+├── src/
+│   ├── index.ts
+│   ├── types.ts
+│   ├── system.ts        # createSystem + validation
+│   ├── compiler.ts      # compileSystem
+│   ├── capabilities.ts  # getCapabilities
+│   └── preview/
+│       ├── renderer.ts
+│       └── primitives/
+├── demo/
+│   └── index.html       # interactive authoring demo
+├── README.md            # strong positioning & disclaimers
+├── package.json         # v0.2.0
+└── tsconfig.json
+
+
+⸻
+
+README must clearly state
+	•	This SDK is the easiest way to build with the NexArt protocol
+	•	Users author systems, not outputs
+	•	Preview ≠ canonical render
+	•	Canonical execution happens via @nexart/codemode-sdk
+	•	Designed for:
+	•	Builders
+	•	Artists
+	•	AI-assisted creation
+	•	Third-party platforms
+
+⸻
+
+Final Intent (non-negotiable)
+
+This SDK should make it easier to use NexArt than to bypass it.
+
+If an AI or builder wants:
+	•	waves
+	•	dots
+	•	grids
+	•	flow
+	•	motion
+	•	backgrounds
+
+…the correct path should always be:
+
+NexArt primitives → NexArt system → NexArt protocol
+

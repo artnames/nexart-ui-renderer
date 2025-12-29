@@ -1,0 +1,133 @@
+Unify SoundArt into Code Mode (Option 2)
+
+Context
+
+We are refactoring NexArt so there is no separate SoundArt engine.
+
+Audio-reactive art must be implemented as Code Mode sketches with audio inputs, using the existing deterministic Code Mode runtime.
+
+Sound is data only, never a renderer.
+
+⸻
+
+🎯 Objective
+
+Fully remove the standalone SoundArt rendering engine and make audio-reactive generation a first-class input to Code Mode.
+
+After this change:
+	•	There is one rendering engine: Code Mode
+	•	Sound analysis produces a snapshot object
+	•	That snapshot is injected into Code Mode sketches
+	•	All visuals (static or animated) are rendered by Code Mode
+	•	Determinism is preserved
+
+⸻
+
+🧱 Target Architecture
+
+Audio Input
+   ↓
+Sound Analysis (existing logic)
+   ↓
+Sound Snapshot (pure data, 0–100 normalized)
+   ↓
+Code Mode Runtime (p5-style, seeded)
+   ↓
+Deterministic Render (static or animated)
+
+There must be no Canvas2D drawing outside Code Mode.
+
+⸻
+
+🛠️ Required Tasks
+
+1. Remove SoundArt as a rendering engine
+	•	Do NOT use Canvas2D drawing functions directly for SoundArt styles
+	•	Keep sound analysis logic only
+	•	Delete or deprecate SoundArt-specific render loops
+
+⸻
+
+2. Formalize the Sound Snapshot
+Create a single snapshot object injected into Code Mode sketches:
+
+sound = {
+  volume,
+  brightness,
+  rhythmicity,
+  harmonicity,
+  aggression,
+  bass,
+  mid,
+  treble,
+  dynamicRange,
+  attack,
+  length,
+  silence,
+  hue,
+  chroma,
+  tNow
+}
+
+All values must be normalized (0–100).
+
+⸻
+
+3. Inject sound into Code Mode
+Extend Code Mode so sketches can access:
+
+S.volume
+S.brightness
+S.rhythmicity
+S.harmonicity
+S.aggression
+// etc
+
+This must work in:
+	•	Static mode
+	•	Animated / looped mode
+
+No sketch should need to know about SoundArt.
+
+⸻
+
+4. Enforce determinism
+	•	All randomness must use seeded random() and noise()
+	•	No Math.random() or time-based randomness in deterministic mode
+	•	Audio snapshot values are deterministic inputs
+
+⸻
+
+5. Convert at least one existing SoundArt style
+Convert Flow Grid Rings into:
+	•	A pure Code Mode sketch
+	•	Driven only by the sound snapshot
+	•	No Canvas2D drawing outside the runtime
+
+This serves as the reference implementation.
+
+⸻
+
+🚫 Constraints (Important)
+	•	Do NOT introduce a new rendering engine
+	•	Do NOT keep SoundArt-specific drawing helpers
+	•	Do NOT bypass Code Mode for visuals
+	•	Do NOT break existing non-audio Code Mode sketches
+
+⸻
+
+✅ Success Criteria
+	•	SoundArt no longer exists as a renderer
+	•	Audio-reactive art is just “Code Mode with sound input”
+	•	One runtime, one protocol, one SDK path
+	•	Deterministic outputs across static + animated renders
+
+⸻
+
+🧠 Design Principle (Non-Negotiable)
+
+NexArt is a generative runtime.
+Sound is just another input, like time or seed.
+
+Implement everything accordingly.
+

@@ -1,0 +1,138 @@
+FIX & RELEASE @nexart/ui-renderer v0.2.1
+
+Context
+
+You are working on @nexart/ui-renderer, a browser-first, non-canonical NexArt SDK.
+
+The SDK is already implemented, but v0.2.0 breaks in Vite/Lovable due to incorrect ESM exports and module configuration.
+
+Your task is to fix packaging only, not change the API or architecture, and publish v0.2.1.
+
+⸻
+
+🎯 Goal
+
+Release @nexart/ui-renderer v0.2.1 that:
+	•	Works in Vite / Lovable / modern browsers
+	•	Properly exposes named ESM exports
+	•	Matches TypeScript declarations at runtime
+	•	Eliminates the error:
+“does not provide an export named ‘createSystem’”
+
+⸻
+
+🔒 Strict Constraints
+	•	❌ Do NOT redesign the SDK
+	•	❌ Do NOT change public API names
+	•	❌ Do NOT add fallbacks or mock behavior
+	•	❌ Do NOT change canonical vs non-canonical semantics
+	•	✅ ONLY fix build + packaging issues
+
+⸻
+
+🛠️ Required Fixes (MANDATORY)
+
+1️⃣ Fix tsconfig.json for ESM + Vite
+Update tsconfig.json to exactly:
+
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "outDir": "dist",
+    "declaration": true,
+    "declarationMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  }
+}
+
+
+⸻
+
+2️⃣ Fix src/index.ts (explicit named exports)
+Ensure explicit named exports exist.
+
+src/index.ts must include:
+
+export { createSystem, validateSystem } from './system';
+export { previewSystem } from './preview/renderer';
+export { compileSystem } from './compiler';
+export { getCapabilities } from './capabilities';
+
+export * from './types';
+
+export const IS_CANONICAL = false;
+export const IS_ARCHIVAL = false;
+export const RENDERER = '@nexart/ui-renderer';
+
+⚠️ Do NOT rely on export * for core API
+⚠️ Do NOT use default export
+
+⸻
+
+3️⃣ Fix package.json for proper ESM publishing
+Update package.json:
+
+{
+  "name": "@nexart/ui-renderer",
+  "version": "0.2.1",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"]
+}
+
+
+⸻
+
+4️⃣ Verify compiled output (CRITICAL)
+After build, verify:
+
+cat dist/index.js
+
+You MUST see:
+
+export { createSystem } from "./system.js";
+
+If you see:
+	•	exports.createSystem = ❌ FAIL
+	•	module.exports ❌ FAIL
+
+⸻
+
+5️⃣ Build, version, publish
+Run:
+
+npm run build
+npm version patch
+npm publish --access public
+
+
+⸻
+
+🧪 Final Verification
+
+Confirm this import works in a Vite/Lovable environment:
+
+import { createSystem, previewSystem } from '@nexart/ui-renderer';
+
+No runtime errors allowed.
+
+⸻
+
+📌 Deliverables
+	•	Published @nexart/ui-renderer@0.2.1
+	•	Working ESM exports
+	•	No breaking API changes
+	•	Ready for Lovable + AI builder usage
+

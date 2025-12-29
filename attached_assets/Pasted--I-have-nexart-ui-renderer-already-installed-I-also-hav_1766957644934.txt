@@ -1,0 +1,82 @@
+
+
+I have @nexart/ui-renderer already installed.
+
+I also have an existing NexArt Code Mode sketch that already runs correctly in loop mode (120 frames).
+The sketch must remain unchanged.
+
+Task
+
+Use the NexArt UI Renderer SDK to render this exact Code Mode sketch as a full-canvas looping generative background.
+
+Requirements
+	1.	Do NOT modify the drawing logic of the sketch
+	2.	Wrap the sketch into a reusable NexArt system using createSystem()
+	3.	Render it using previewSystem() with:
+	•	mode: "loop"
+	•	totalFrames: 120
+	•	deterministic playback
+	4.	Mount the canvas as a full-screen background (cover, centered)
+	5.	Ensure rendering is 100% via the NexArt runtime
+	•	no Canvas2D fallbacks
+	•	no CSS-only visuals
+	•	no external renderers
+
+Visual Intent (do not alter)
+	•	Off-white background
+	•	Dark grey layered oscillating lines
+	•	Calm, architectural, generative abstraction
+
+Outcome
+	•	A clean SDK-based looping background
+	•	Protocol-compliant
+	•	Reusable for demos, landing pages, and Mini Apps
+
+Use this sketch verbatim:
+
+// GENRE: Generative Abstraction
+
+function setup() {
+  noFill();
+}
+
+function draw() {
+  const totalFrames = 120;
+  const t = (frameCount % totalFrames) / totalFrames;
+
+  background(246, 245, 242); // off-white
+
+  push();
+  translate(width * 0.5, height * 0.5);
+  rotate(radians(148));
+
+  const span = max(width, height) * 6.2;
+  const layers = 7;
+  const points = 460;
+  const spacing = min(width, height) * 0.025;
+
+  stroke(55, 55, 55); // dark grey
+  strokeWeight(2);
+
+  for (let l = 0; l < layers; l++) {
+    const yBase = (l - (layers - 1) / 2) * spacing;
+    const freq = 1.2 + l * 0.45;
+    const phase = l * 0.5;
+
+    beginShape();
+    for (let i = 0; i < points; i++) {
+      const x = map(i, 0, points - 1, -span / 2, span / 2);
+      const wave =
+        sin((i / points) * TWO_PI * freq + t * TWO_PI + phase) *
+        cos(t * TWO_PI);
+      const amp = min(width, height) * 0.04 * (0.6 + l * 0.08);
+      vertex(x, yBase + wave * amp);
+    }
+    endShape();
+  }
+
+  pop();
+}
+
+Do not invent new systems. Do not simplify. Just wrap and render via the SDK.
+

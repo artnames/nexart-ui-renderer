@@ -1,0 +1,57 @@
+Perform a full architectural and code-level audit of the SoundArt mode to verify that it is 100% compliant with the NexArt protocol and exclusively uses the Code Mode engine for rendering.
+
+Context:
+SoundArt was previously rendered via a legacy Canvas 2D renderer with soft protocol enforcement.
+SoundArt has now been migrated to render through the Code Mode deterministic runtime.
+The goal is to fully retire legacy rendering paths and treat SoundArt as a first-class NexArt system generator.
+
+⸻
+
+Audit Objectives
+
+You must prove or disprove the following statements with concrete evidence from the codebase:
+	1.	Rendering Path
+	•	All SoundArt styles render via the Code Mode engine
+	•	No active SoundArt style uses a legacy Canvas 2D renderer
+	•	No visual output bypasses the NexArt runtime
+	2.	System Generation
+	•	Each SoundArt style compiles into a valid NexArt system
+	•	Audio input is mapped to parameters, not imperative drawing
+	•	All drawing uses protocol-approved primitives and Code Mode APIs
+	3.	Determinism
+	•	Seeded randomness is used consistently
+	•	Audio snapshots do not break determinism guarantees
+	•	Replaying the same audio + seed yields the same system behavior
+	4.	Legacy Code
+	•	Identify any remaining legacy SoundArt renderer code paths
+	•	Confirm whether they are unused, deprecated, or still active
+	•	Recommend deletion or hard deprecation if found
+	5.	Render Gate & Routing
+	•	Verify that the render gate always routes SoundArt through Code Mode
+	•	Ensure no runtime fallbacks silently switch to legacy rendering
+
+⸻
+
+Deliverables
+	1.	Compliance Report
+	•	Bullet-point verification for each objective above
+	•	Explicit ✅ / ❌ / ⚠️ status per item
+	2.	Code References
+	•	File paths and functions proving compliance
+	•	Clear identification of any non-compliant code
+	3.	Final Verdict
+	•	Is SoundArt now fully protocol-native? (Yes / No)
+	•	If not, list exactly what must change
+	4.	Cleanup Plan (if needed)
+	•	Concrete steps to remove remaining legacy paths
+	•	Safe migration or deletion instructions
+
+⸻
+
+Constraints
+	•	Do not add new features
+	•	Do not refactor unrelated code
+	•	This is an audit only
+	•	Be strict — assume this will be used for protocol documentation
+
+Treat SoundArt as a protocol surface, not a UI feature.

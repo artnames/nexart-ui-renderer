@@ -1,0 +1,281 @@
+Perfect — below is a clear, strict, copy-pasteable Replit prompt that is intentionally detailed enough to force the correct architecture, prevent shortcuts, and align exactly with the NexArt protocol goals.
+
+This prompt is written so Replit (or any AI dev agent) cannot misunderstand intent and cannot drift into ad-hoc rendering.
+
+⸻
+
+🔐 REPLIT PROMPT — NexArt UI Renderer SDK v0.2
+
+Title: Build @nexart/ui-renderer v0.2 — Declarative System Authoring SDK for NexArt Protocol
+
+⸻
+
+CONTEXT (READ CAREFULLY)
+
+You are building version 0.2 of the NexArt UI Renderer SDK.
+
+This SDK is NOT a replacement for the canonical NexArt engine.
+It is a browser-first authoring + preview SDK designed to:
+	•	Let builders, artists, and AI platforms construct NexArt systems declaratively
+	•	Preview systems visually in the browser
+	•	Compile systems into canonical protocol-compatible system objects
+	•	Reduce friction so AI and builders use NexArt instead of bypassing it
+
+There already exists a canonical SDK (@nexart/codemode-sdk) that:
+	•	Runs in Node.js only
+	•	Is archival and authoritative
+	•	Executes systems deterministically for minting
+
+This SDK must not replicate or replace that role.
+
+⸻
+
+CORE DESIGN PRINCIPLE (NON-NEGOTIABLE)
+
+This SDK authors systems. It does NOT invent new rendering rules.
+
+	•	The SDK exposes primitives, not freeform drawing
+	•	Users cannot inject arbitrary canvas code
+	•	Systems are declarative, structured, finite
+	•	Preview rendering is illustrative, not canonical
+	•	Canonical execution always happens elsewhere
+
+⸻
+
+WHAT YOU ARE BUILDING
+
+Package
+
+@nexart/ui-renderer
+
+Version
+
+v0.2.0
+
+Runtime
+	•	Browser only
+	•	Uses HTML Canvas + Web APIs
+	•	No Node.js dependencies
+	•	No Deno / Edge requirements
+
+⸻
+
+HIGH-LEVEL ARCHITECTURE
+
+The SDK must have three layers:
+
+⸻
+
+1️⃣ System Authoring Layer (MOST IMPORTANT)
+
+Expose a declarative API to define a NexArt system.
+
+Example usage:
+
+import { createSystem } from "@nexart/ui-renderer";
+
+const system = createSystem({
+  version: "0.2",
+  seed: 29445825,
+  background: {
+    color: "blue",
+    texture: "noise"
+  },
+  elements: [
+    {
+      type: "wave",
+      axis: "x",
+      amplitude: 0.4,
+      frequency: 0.7
+    },
+    {
+      type: "dots",
+      distribution: "radial",
+      count: 400,
+      size: [1, 4]
+    }
+  ],
+  motion: {
+    source: "time",
+    speed: 0.2
+  }
+});
+
+
+⸻
+
+2️⃣ Preview Renderer Layer (Browser Only)
+
+Expose:
+
+previewSystem(system, canvas)
+
+	•	Renders a visual approximation
+	•	Deterministic per seed
+	•	Uses requestAnimationFrame
+	•	Supports static + loop modes
+	•	MUST display a visible badge:
+
+⚠️ Preview Renderer (Non-Canonical)
+
+Preview rendering rules:
+	•	Clean, aesthetic, generative
+	•	No attempt at archival fidelity
+	•	Never claims canonical correctness
+
+⸻
+
+3️⃣ Compiler Layer
+
+Expose:
+
+compileSystem(system)
+
+This must:
+	•	Validate schema
+	•	Normalize values
+	•	Output a canonical system object
+	•	Be JSON-serializable
+	•	Be compatible with future canonical SDK ingestion
+
+Example output:
+
+{
+  "protocol": "nexart",
+  "systemVersion": "0.2",
+  "seed": 29445825,
+  "background": {...},
+  "elements": [...],
+  "motion": {...},
+  "deterministic": true
+}
+
+
+⸻
+
+PRIMITIVE VOCABULARY (v0)
+
+You MUST define a finite, explicit vocabulary.
+
+Background
+	•	color (string or palette ref)
+	•	gradient (optional)
+	•	texture: none | noise | grain
+
+Elements (union type)
+	•	dots
+	•	lines
+	•	waves
+	•	grids
+	•	flowField
+	•	orbits
+
+Each element:
+	•	Has bounded numeric ranges
+	•	No arbitrary functions
+	•	No user-provided drawing callbacks
+
+Motion
+	•	none
+	•	time
+	•	seed
+	•	data (placeholder, non-implemented)
+
+⸻
+
+WHAT IS STRICTLY FORBIDDEN ❌
+	•	❌ Arbitrary canvas drawing APIs exposed to user
+	•	❌ Passing functions into the SDK
+	•	❌ Freeform p5.js compatibility
+	•	❌ Claiming canonical or archival correctness
+	•	❌ Re-implementing the canonical SDK
+	•	❌ Using fallback renderers outside the system vocabulary
+
+⸻
+
+PACKAGE STRUCTURE
+
+nexart-ui-renderer/
+├── src/
+│   ├── index.ts          # Public API
+│   ├── system.ts         # Schema + validation
+│   ├── compiler.ts       # compileSystem()
+│   ├── preview/
+│   │   ├── renderer.ts
+│   │   ├── primitives/
+│   │   │   ├── dots.ts
+│   │   │   ├── waves.ts
+│   │   │   ├── grid.ts
+│   │   │   └── flow.ts
+│   └── types.ts
+├── demo/
+│   └── index.html        # Full demo
+├── README.md
+├── package.json
+├── tsconfig.json
+
+
+⸻
+
+README REQUIREMENTS (IMPORTANT)
+
+README MUST clearly state:
+	•	This SDK is non-canonical
+	•	This SDK is for authoring & preview
+	•	Canonical execution happens via @nexart/codemode-sdk
+	•	Same system → same output within this SDK, but preview ≠ mint truth
+	•	AI platforms are encouraged to use this SDK to generate systems
+
+Include:
+	•	Philosophy section
+	•	Example system creation
+	•	Preview example
+	•	Compile example
+	•	Protocol disclaimer
+
+⸻
+
+DEMO REQUIREMENTS
+
+The demo page must:
+	•	Fill the screen
+	•	Render a live preview
+	•	Show seed + UTC time
+	•	Allow switching primitives
+	•	Show “Preview Renderer (Non-Canonical)” badge
+	•	Export compiled system JSON
+
+⸻
+
+SUCCESS CRITERIA
+
+This SDK is successful if:
+	•	An AI can be prompted:
+“Create a blue background with flowing waves using NexArt”
+and uses this SDK
+	•	Builders can create platforms on top of it
+	•	Artists can prototype systems visually
+	•	Canonical SDK remains the authority
+	•	Protocol adoption friction is reduced
+
+⸻
+
+FINAL INSTRUCTION
+
+Build this SDK cleanly, explicitly, and conservatively.
+
+Do not add features beyond scope.
+Do not invent protocol rules.
+Do not optimize prematurely.
+
+This SDK is the front door to the NexArt protocol.
+
+⸻
+
+If you want, next I can:
+	•	Write the exact README copy
+	•	Define SystemSchema v0 formally
+	•	Create the announcement thread
+	•	Design the migration from v0.1 → v0.2
+
+But this prompt is ready to paste into Replit as-is.

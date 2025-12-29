@@ -1,0 +1,14 @@
+{
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "**/node_modules/**": true,
+    "**/scripts_backup/**": true,
+    "**/attached_assets/**": true,
+    "**/cache/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+    "**/*.log": true,
+    "**/temp_*/**": true,
+    "**/*_backup*/**": true
+  }
+}

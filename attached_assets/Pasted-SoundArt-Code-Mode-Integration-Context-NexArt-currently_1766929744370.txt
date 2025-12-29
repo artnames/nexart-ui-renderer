@@ -1,0 +1,122 @@
+SoundArt → Code Mode Integration
+
+Context
+
+NexArt currently has:
+	•	A Code Mode engine (the canonical, deterministic generative runtime)
+	•	A SoundArt engine built on Canvas2D with its own style system
+
+The goal is to merge SoundArt into the Code Mode engine, so SoundArt becomes an input layer, not a parallel renderer.
+
+Code Mode must remain the single protocol execution layer.
+
+⸻
+
+🎯 Objective
+
+Refactor SoundArt so that:
+	1.	Sound analysis produces a canonical snapshot
+	2.	That snapshot is injected into Code Mode as deterministic inputs
+	3.	SoundArt styles become ordinary Code Mode sketches
+	4.	No SoundArt-specific rendering engine remains
+
+⸻
+
+🧠 Target Architecture (IMPORTANT)
+
+1️⃣ Sound → Snapshot (keep Canvas2D here if needed)
+Sound analysis may stay Canvas2D / WebAudio-based, but it must output only data, not visuals.
+
+Canonical snapshot shape (example):
+
+SoundSnapshot = {
+  volume: number        // 0–100
+  brightness: number
+  aggression: number
+  harmonicity: number
+  rhythmicity: number
+  bass: number
+  mid: number
+  treble: number
+  attack: number
+  dynamicRange: number
+  length: number
+  hue: number
+  chroma: number
+  t: number             // time or frame
+}
+
+This snapshot must be:
+	•	Pure data
+	•	Deterministic for a given audio input + frame
+	•	Serializable
+
+⸻
+
+2️⃣ Inject snapshot into Code Mode
+Expose the snapshot inside Code Mode as a read-only global object:
+
+S.volume
+S.bass
+S.treble
+S.t
+
+Rules:
+	•	No randomness introduced here
+	•	Snapshot is frozen per render/frame
+	•	Code Mode remains deterministic
+
+⸻
+
+3️⃣ Refactor SoundArt styles
+Each SoundArt style must be converted to:
+	•	A pure Code Mode sketch
+	•	Using S.* instead of SoundArt helpers
+	•	Using existing Code Mode primitives (point, line, geometry guides, etc.)
+
+Example conversion:
+
+const density = map(S.volume, 0, 100, 200, 2000)
+const chaos = S.aggression * 0.01
+const hue = S.hue * 3.6
+
+No Canvas2D calls inside styles.
+
+⸻
+
+🚫 Explicitly Do NOT
+	•	Do NOT create a second rendering engine
+	•	Do NOT keep SoundArt-only APIs
+	•	Do NOT mix protocol logic with audio analysis
+	•	Do NOT break existing Code Mode determinism
+
+⸻
+
+✅ Success Criteria
+
+By the end of this task:
+	•	SoundArt is implemented as Code Mode + sound inputs
+	•	Adding a new SoundArt style requires only a Code Mode sketch
+	•	Code Mode remains the single NexArt protocol runtime
+	•	Canvas2D is used only for:
+	•	audio analysis
+	•	preview rendering (if needed)
+
+⸻
+
+📦 Deliverables
+	1.	SoundSnapshot type definition
+	2.	Snapshot → Code Mode injection layer
+	3.	Example converted SoundArt style written as Code Mode
+	4.	Clear separation between:
+	•	sound analysis
+	•	protocol execution
+	•	rendering
+
+⸻
+
+🧭 Guiding Principle
+
+If a feature cannot be expressed as a Code Mode sketch using S.* inputs, it does not belong in SoundArt.
+
+⸻

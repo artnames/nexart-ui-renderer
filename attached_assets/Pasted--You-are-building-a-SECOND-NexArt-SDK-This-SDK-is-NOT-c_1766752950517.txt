@@ -1,0 +1,160 @@
+
+You are building a SECOND NexArt SDK.
+
+This SDK is NOT canonical and NOT archival.
+It is a browser-first / UI renderer SDK designed to reduce builder friction and enable experimentation, demos, miniapps, and playgrounds.
+
+CRITICAL CONTEXT (DO NOT IGNORE)
+
+There is an existing SDK:
+	•	@nexart/codemode-sdk
+	•	Node.js only
+	•	Server-side only
+	•	Canonical, deterministic, archival
+	•	Outputs PNG / MP4 buffers
+	•	Used in production by nexart.xyz
+
+⚠️ You must NOT modify or re-implement that SDK.
+⚠️ You must NOT claim canonical or archival correctness.
+⚠️ You must NOT simulate or fake the canonical SDK.
+
+This project creates a separate SDK.
+
+⸻
+
+SDK NAME
+
+Create a new package called:
+
+@nexart/ui-renderer
+
+
+⸻
+
+GOAL OF THIS SDK
+	•	Allow developers to render NexArt-style systems in the browser
+	•	Work in:
+	•	Browsers
+	•	Replit
+	•	Lovable
+	•	Canvas-based environments
+	•	Be explicitly non-canonical
+	•	Be clearly labeled as exploratory
+
+This SDK exists to show what’s possible, not to define truth.
+
+⸻
+
+ENVIRONMENT REQUIREMENTS
+	•	Must run in:
+	•	Browser
+	•	Vite / React
+	•	Plain HTML + JS
+	•	Must NOT require:
+	•	Node.js
+	•	jsdom
+	•	node-canvas
+	•	Use:
+	•	<canvas>
+	•	Web APIs only
+
+⸻
+
+CORE DESIGN PRINCIPLES
+	1.	Protocol-aligned, not protocol-authoritative
+	2.	Best-effort determinism
+	3.	Same API shape where reasonable, but not full parity
+	4.	Clear disclaimers everywhere
+
+⸻
+
+REQUIRED PUBLIC API
+
+The SDK must expose the following minimal API:
+
+createUIRenderer(options: {
+  canvas: HTMLCanvasElement
+  seed: number
+  mode: "static" | "loop"
+  width?: number
+  height?: number
+})
+
+Returned object must support:
+
+renderer.render()
+renderer.start()
+renderer.stop()
+renderer.setSeed(newSeed: number)
+renderer.destroy()
+
+
+⸻
+
+RENDERING REQUIREMENTS
+	•	Use deterministic PRNG seeded by seed
+	•	Render abstract generative art
+	•	Style guidance:
+	•	Vortex
+	•	Flow fields
+	•	Radial / orbital motion
+	•	No need to match canonical output
+	•	Must be visually compelling
+
+⸻
+
+REQUIRED WARNINGS / DISCLAIMERS
+
+The SDK must expose (and document):
+
+renderer.isCanonical === false
+renderer.isArchival === false
+
+And include this exact disclaimer in README:
+
+“This SDK is for exploration and UI rendering only.
+Canonical, archival output is produced exclusively by @nexart/codemode-sdk.”
+
+⸻
+
+WHAT TO BUILD IN THIS REPLIT PROJECT
+	1.	The SDK source code
+	2.	A minimal demo app:
+	•	Canvas fills screen
+	•	Uses current UTC time as seed
+	•	Re-renders every 30–60 seconds
+	3.	Clear visual badge:
+	•	“Exploratory Renderer (Non-Canonical)”
+
+⸻
+
+WHAT YOU MUST NOT DO
+	•	❌ Do NOT import @nexart/codemode-sdk
+	•	❌ Do NOT re-implement canonical logic
+	•	❌ Do NOT output PNG buffers
+	•	❌ Do NOT claim determinism guarantees
+	•	❌ Do NOT fake protocol enforcement
+
+⸻
+
+SUCCESS CRITERIA
+
+This SDK is successful if:
+	•	A beginner can render generative art in 5 minutes
+	•	It works in the browser without hacks
+	•	It clearly distinguishes itself from the canonical SDK
+	•	It reduces builder frustration
+
+⸻
+
+DELIVERABLES
+	•	src/index.ts
+	•	src/renderer.ts
+	•	README.md
+	•	Demo app in /demo
+
+⸻
+
+Build this carefully and intentionally.
+This SDK is about access, not authority.
+
