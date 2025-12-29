@@ -1,6 +1,6 @@
 # @nexart/ui-renderer
 
-Version: 0.2.1
+Version: 0.3.1
 
 **Declarative System Authoring SDK for NexArt Protocol**
 
@@ -9,7 +9,6 @@ Version: 0.2.1
 > ⚠️ **IMPORTANT DISCLAIMER**
 >
 > **This SDK is for authoring and preview only.**
-> **Canonical, archival output is produced exclusively by @nexart/codemode-sdk.**
 >
 > This SDK is:
 > - **NOT canonical** — Does not produce archival-quality output
@@ -20,17 +19,37 @@ Version: 0.2.1
 
 ---
 
-## Philosophy
+## Protocol Alignment
 
-The NexArt Protocol defines how generative art systems work. This SDK provides:
+This SDK **mirrors** NexArt's protocol-enforced production runtime behavior without being the canonical source of truth.
 
-1. **System Authoring** — Declarative API to define NexArt systems
-2. **Preview Rendering** — Visual approximation in the browser
-3. **Compilation** — Export protocol-compatible JSON for canonical execution
+| Aspect | SDK Behavior |
+|--------|--------------|
+| **Determinism** | Seeded PRNG produces same output for same seed |
+| **System Model** | Matches protocol schema (background, elements, motion) |
+| **Rendering** | Canvas2D approximation of production behavior |
+| **Authority** | Preview only — NOT canonical |
 
-This SDK exists to **reduce friction** for builders, artists, and AI platforms. It is the front door to the NexArt Protocol — not the authority.
+### Supported Element Types
 
-**Canonical execution happens via `@nexart/codemode-sdk`.**
+| Type | Description |
+|------|-------------|
+| `background` | Opinionated presets with guardrails (color, texture, gradient) |
+| `primitive` | Declarative generative components (dots, lines, waves, grid, flowField, orbits) |
+| `sketch` | Raw Code Mode execution (sandboxed p5.js-style API) |
+
+### Enforcement Disclaimer
+
+SoundArt, Noise, and Shapes creation modes are **protocol-enforced** via the Code Mode runtime. This SDK provides preview approximation only — canonical output is produced server-side.
+
+---
+
+## What This SDK Does NOT Guarantee
+
+- **Canonical output** — Use server-side rendering for minting
+- **Archival quality** — Preview only, not production-grade
+- **Cross-version stability** — SDK may change between versions
+- **Frame-perfect matching** — Approximation of production behavior
 
 ---
 
@@ -113,7 +132,7 @@ Create a validated NexArt system.
 
 ```typescript
 const system = createSystem({
-  version?: string,        // Protocol version (default: '0.2')
+  version?: string,        // Protocol version (default: '0.3')
   seed: number,            // Required: PRNG seed
   background: {
     color: string,         // Required: background color
@@ -156,14 +175,14 @@ Compile to protocol-compatible JSON.
 const compiled = compileSystem(system);
 // {
 //   protocol: 'nexart',
-//   systemVersion: '0.2',
+//   systemVersion: '0.3',
 //   seed: 29445825,
 //   background: {...},
 //   elements: [...],
 //   motion: {...},
 //   deterministic: true,
-//   compiledAt: '2024-12-26T...',
-//   compilerVersion: '0.2.0'
+//   compiledAt: '2024-12-29T...',
+//   compilerVersion: '0.3.1'
 // }
 ```
 
@@ -187,7 +206,7 @@ import { getCapabilities } from '@nexart/ui-renderer';
 
 const caps = getCapabilities();
 // {
-//   version: '0.2.0',
+//   version: '0.3.1',
 //   isCanonical: false,
 //   isArchival: false,
 //   renderer: '@nexart/ui-renderer',
@@ -205,7 +224,7 @@ Use this to:
 
 ---
 
-## Primitive Vocabulary (v0.2)
+## Primitive Vocabulary (v0.3)
 
 ### Elements
 
@@ -286,19 +305,6 @@ No polyfills required.
 
 ---
 
-## Comparison with @nexart/codemode-sdk
-
-| Feature | @nexart/ui-renderer | @nexart/codemode-sdk |
-|---------|---------------------|----------------------|
-| Environment | Browser only | Node.js / Server |
-| Purpose | Authoring / Preview | Production / Minting |
-| Canonical | ❌ No | ✅ Yes |
-| Archival | ❌ No | ✅ Yes |
-| Output | Canvas / JSON | PNG / MP4 buffers |
-| API | Declarative systems | Code execution |
-
----
-
 ## License
 
 MIT License
@@ -307,5 +313,5 @@ Copyright (c) 2024 NexArt
 
 ---
 
-> **Reminder:** This SDK authors systems. It does NOT invent new rendering rules.
-> Canonical execution always happens via `@nexart/codemode-sdk`.
+> **Reminder:** This SDK authors systems and provides preview rendering.
+> It is NOT canonical — use server-side rendering for production/minting.
