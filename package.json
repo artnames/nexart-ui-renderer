@@ -1,0 +1,47 @@
+{
+  "name": "@nexart/ui-renderer",
+  "version": "0.8.2",
+  "description": "Lightweight Preview Runtime for NexArt Protocol. Non-canonical, performance-optimized with budget limits (max 30 frames, 500ms, 900px canvas).",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@nexart/codemode-sdk": "^1.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "nexart",
+    "generative-art",
+    "canvas",
+    "browser",
+    "declarative",
+    "protocol",
+    "authoring",
+    "preview"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artnames/nexart-ui-renderer.git"
+  },
+  "author": "NexArt",
+  "publishConfig": {
+    "access": "public"
+  }
+}

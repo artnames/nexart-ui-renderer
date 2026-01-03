@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexArt UI Renderer v0.2 Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0a0a;
+      min-height: 100vh;
+      display: flex;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #fff;
+    }
+
+    .sidebar {
+      width: 320px;
+      background: #111;
+      padding: 20px;
+      overflow-y: auto;
+      border-right: 1px solid #222;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .badge {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 100, 100, 0.15);
+      border: 1px solid rgba(255, 100, 100, 0.4);
+      color: #ff9999;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      z-index: 100;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    h2 {
+      font-size: 14px;
+      margin: 20px 0 10px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    canvas {
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      max-width: 100%;
+      max-height: calc(100vh - 100px);
+    }
+
+    .control-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 5px;
+    }
+
+    select, input[type="number"], input[type="text"] {
+      width: 100%;
+      padding: 8px 12px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    select:focus, input:focus {
+      outline: none;
+      border-color: #555;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    button.primary {
+      background: rgba(100, 150, 255, 0.3);
+      border-color: rgba(100, 150, 255, 0.5);
+    }
+
+    .info {
+      font-size: 12px;
+      color: #666;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #222;
+    }
+
+    .info div {
+      margin-bottom: 5px;
+    }
+
+    .json-output {
+      margin-top: 20px;
+      padding: 15px;
+      background: #0a0a0a;
+      border: 1px solid #222;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 11px;
+      max-height: 200px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .element-tag {
+      display: inline-block;
+      background: rgba(100, 150, 255, 0.2);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin: 2px;
+      cursor: pointer;
+    }
+
+    .element-tag.active {
+      background: rgba(100, 150, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="badge" data-testid="badge-disclaimer">
+    ⚠️ Preview Renderer (Non-Canonical)
+  </div>
+
+  <div class="sidebar">
+    <h1>NexArt UI Renderer v0.2</h1>
+
+    <h2>Background</h2>
+    <div class="control-group">
+      <label>Color</label>
+      <select id="bg-color" data-testid="select-bg-color">
+        <option value="black">Black</option>
+        <option value="blue" selected>Blue</option>
+        <option value="purple">Purple</option>
+        <option value="#1a1a2e">Dark Navy</option>
+        <option value="#0f0f23">Midnight</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Texture</label>
+      <select id="bg-texture" data-testid="select-bg-texture">
+        <option value="none">None</option>
+        <option value="noise" selected>Noise</option>
+        <option value="grain">Grain</option>
+      </select>
+    </div>
+
+    <h2>Elements</h2>
+    <div class="control-group">
+      <label>Active Elements (click to toggle)</label>
+      <div id="element-tags">
+        <span class="element-tag active" data-type="waves" data-testid="tag-waves">waves</span>
+        <span class="element-tag active" data-type="dots" data-testid="tag-dots">dots</span>
+        <span class="element-tag" data-type="flowField" data-testid="tag-flow">flowField</span>
+        <span class="element-tag" data-type="orbits" data-testid="tag-orbits">orbits</span>
+        <span class="element-tag" data-type="grid" data-testid="tag-grid">grid</span>
+        <span class="element-tag" data-type="lines" data-testid="tag-lines">lines</span>
+      </div>
+    </div>
+
+    <h2>Motion</h2>
+    <div class="control-group">
+      <label>Source</label>
+      <select id="motion-source" data-testid="select-motion">
+        <option value="none">None (Static)</option>
+        <option value="time" selected>Time (Animated)</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Speed</label>
+      <input type="number" id="motion-speed" value="0.3" min="0" max="5" step="0.1" data-testid="input-speed">
+    </div>
+
+    <h2>Seed</h2>
+    <div class="control-group">
+      <input type="number" id="seed" data-testid="input-seed">
+    </div>
+
+    <div class="buttons">
+      <button id="btn-randomize" data-testid="button-randomize">Randomize</button>
+      <button id="btn-toggle" class="primary" data-testid="button-toggle">Start</button>
+    </div>
+
+    <div class="info">
+      <div>UTC: <span id="utc-time">-</span></div>
+      <div>Seed: <span id="seed-display">-</span></div>
+    </div>
+
+    <h2>Compiled JSON</h2>
+    <div class="json-output" id="json-output" data-testid="text-json">-</div>
+    <div class="buttons">
+      <button id="btn-copy" data-testid="button-copy">Copy JSON</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <canvas id="canvas" width="600" height="600" data-testid="canvas-main"></canvas>
+  </div>
+
+  <script type="module">
+    function createPRNG(seed) {
+      let state = seed;
+      return () => {
+        state |= 0;
+        state = (state + 0x6d2b79f5) | 0;
+        let t = Math.imul(state ^ (state >>> 15), 1 | state);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    const colorMap = {
+      red: '#ff0000', green: '#00ff00', blue: '#0000ff',
+      black: '#000000', white: '#ffffff', yellow: '#ffff00',
+      cyan: '#00ffff', magenta: '#ff00ff', orange: '#ff8000',
+      purple: '#8000ff', pink: '#ff0080', gray: '#808080'
+    };
+
+    function parseColor(c) { return colorMap[c.toLowerCase()] || c; }
+
+    const primitives = {
+      dots: (ctx, el, w, h, rand, t) => {
+        ctx.fillStyle = el.color || 'white';
+        ctx.globalAlpha = el.opacity ?? 1;
+        for (let i = 0; i < el.count; i++) {
+          let x, y;
+          const size = el.size[0] + rand() * (el.size[1] - el.size[0]);
+          if (el.distribution === 'radial') {
+            const a = rand() * Math.PI * 2;
+            const r = rand() * Math.min(w, h) * 0.45;
+            x = w/2 + Math.cos(a + t * 0.5) * r;
+            y = h/2 + Math.sin(a + t * 0.5) * r;
+          } else if (el.distribution === 'spiral') {
+            const a = (i / el.count) * Math.PI * 8 + t;
+            const r = (i / el.count) * Math.min(w, h) * 0.45;
+            x = w/2 + Math.cos(a) * r;
+            y = h/2 + Math.sin(a) * r;
+          } else {
+            x = rand() * w; y = rand() * h;
+          }
+          ctx.beginPath();
+          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      },
+      waves: (ctx, el, w, h, rand, t) => {
+        ctx.strokeStyle = el.color || 'white';
+        ctx.globalAlpha = el.opacity ?? 1;
+        ctx.lineWidth = 2;
+        const count = el.count || 8;
+        const maxAmp = Math.min(w, h) * 0.3 * el.amplitude;
+        for (let i = 0; i < count; i++) {
+          ctx.beginPath();
+          if (el.axis === 'x') {
+            const baseY = h * (0.2 + (i / count) * 0.6);
+            for (let x = 0; x <= w; x += 5) {
+              const phase = (x / w) * Math.PI * 2 * el.frequency + t * 2 + i;
+              const y = baseY + Math.sin(phase) * maxAmp;
+              x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+          } else {
+            const baseX = w * (0.2 + (i / count) * 0.6);
+            for (let y = 0; y <= h; y += 5) {
+              const phase = (y / h) * Math.PI * 2 * el.frequency + t * 2 + i;
+              const x = baseX + Math.sin(phase) * maxAmp;
+              y === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+          }
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+      },
+      flowField: (ctx, el, w, h, rand, seed, t) => {
+        ctx.strokeStyle = el.color || 'white';
+        ctx.globalAlpha = (el.opacity ?? 1) * 0.6;
+        ctx.lineWidth = 1;
+        const noise2D = (x, y) => {
+          const n = Math.sin(x * 12.9898 + y * 78.233 + seed * 0.001) * 43758.5453;
+          return n - Math.floor(n);
+        };
+        for (let i = 0; i < el.particles; i++) {
+          let x = rand() * w, y = rand() * h;
+          ctx.beginPath(); ctx.moveTo(x, y);
+          for (let s = 0; s < 20; s++) {
+            const n = noise2D(x / el.resolution, y / el.resolution + t * 0.3);
+            const a = n * Math.PI * 4 * el.strength;
+            x += Math.cos(a) * 3; y += Math.sin(a) * 3;
+            if (x < 0 || x > w || y < 0 || y > h) break;
+            ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+      },
+      orbits: (ctx, el, w, h, rand, t) => {
+        ctx.fillStyle = el.color || 'white';
+        ctx.globalAlpha = el.opacity ?? 1;
+        for (let o = 0; o < el.count; o++) {
+          const r = el.radius[0] + rand() * (el.radius[1] - el.radius[0]);
+          const phase = rand() * Math.PI * 2;
+          for (let d = 0; d < el.dotCount; d++) {
+            const a = (d / el.dotCount) * Math.PI * 2 + t * (el.speed || 1) + phase;
+            const wobble = Math.sin(a * 3 + t * 2) * 10;
+            const x = w/2 + Math.cos(a) * (r + wobble);
+            const y = h/2 + Math.sin(a) * (r + wobble);
+            ctx.beginPath(); ctx.arc(x, y, 2 + rand() * 3, 0, Math.PI * 2); ctx.fill();
+          }
+        }
+        ctx.globalAlpha = 1;
+      },
+      grid: (ctx, el, w, h, rand, t) => {
+        ctx.fillStyle = el.color || 'white';
+        ctx.globalAlpha = el.opacity ?? 1;
+        const cellW = w / el.cols, cellH = h / el.rows;
+        const baseSize = el.cellSize || Math.min(cellW, cellH) * 0.4;
+        for (let row = 0; row < el.rows; row++) {
+          for (let col = 0; col < el.cols; col++) {
+            const x = cellW * (col + 0.5), y = cellH * (row + 0.5);
+            const pulse = 1 + Math.sin((row + col) * 0.5 + t * 3) * 0.2;
+            const size = baseSize * pulse;
+            ctx.beginPath();
+            if (el.shape === 'circle') ctx.arc(x, y, size/2, 0, Math.PI * 2);
+            else if (el.shape === 'diamond') {
+              ctx.moveTo(x, y - size/2); ctx.lineTo(x + size/2, y);
+              ctx.lineTo(x, y + size/2); ctx.lineTo(x - size/2, y); ctx.closePath();
+            } else ctx.rect(x - size/2, y - size/2, size, size);
+            ctx.fill();
+          }
+        }
+        ctx.globalAlpha = 1;
+      },
+      lines: (ctx, el, w, h, rand, t) => {
+        ctx.strokeStyle = el.color || 'white';
+        ctx.globalAlpha = el.opacity ?? 1;
+        for (let i = 0; i < el.count; i++) {
+          ctx.lineWidth = el.thickness[0] + rand() * (el.thickness[1] - el.thickness[0]);
+          ctx.beginPath();
+          if (el.direction === 'horizontal') {
+            const y = (i / el.count) * h + Math.sin(i * 0.5 + t * 2) * 10;
+            ctx.moveTo(0, y); ctx.lineTo(w, y);
+          } else if (el.direction === 'vertical') {
+            const x = (i / el.count) * w + Math.sin(i * 0.5 + t * 2) * 10;
+            ctx.moveTo(x, 0); ctx.lineTo(x, h);
+          } else if (el.direction === 'radial') {
+            const a = (i / el.count) * Math.PI * 2 + t * 0.2;
+            ctx.moveTo(w/2, h/2);
+            ctx.lineTo(w/2 + Math.cos(a) * w * 0.4, h/2 + Math.sin(a) * h * 0.4);
+          } else {
+            const off = (i / el.count) * (w + h) - h;
+            ctx.moveTo(off, 0); ctx.lineTo(off + h, h);
+          }
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+      }
+    };
+
+    const elementConfigs = {
+      waves: { type: 'waves', axis: 'x', amplitude: 0.4, frequency: 0.7, count: 8, opacity: 0.8 },
+      dots: { type: 'dots', distribution: 'radial', count: 400, size: [1, 4], opacity: 0.9 },
+      flowField: { type: 'flowField', resolution: 30, strength: 0.8, particles: 1500, opacity: 0.7 },
+      orbits: { type: 'orbits', count: 4, radius: [80, 200], dotCount: 40, speed: 0.8, opacity: 0.8 },
+      grid: { type: 'grid', rows: 10, cols: 10, shape: 'circle', opacity: 0.6 },
+      lines: { type: 'lines', direction: 'radial', count: 24, thickness: [1, 3], opacity: 0.5 }
+    };
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    let currentSeed = Date.now();
+    let isAnimating = false;
+    let animationId = null;
+    let activeElements = new Set(['waves', 'dots']);
+
+    const bgColorSelect = document.getElementById('bg-color');
+    const bgTextureSelect = document.getElementById('bg-texture');
+    const motionSourceSelect = document.getElementById('motion-source');
+    const motionSpeedInput = document.getElementById('motion-speed');
+    const seedInput = document.getElementById('seed');
+    const btnRandomize = document.getElementById('btn-randomize');
+    const btnToggle = document.getElementById('btn-toggle');
+    const btnCopy = document.getElementById('btn-copy');
+    const jsonOutput = document.getElementById('json-output');
+    const seedDisplay = document.getElementById('seed-display');
+    const utcTime = document.getElementById('utc-time');
+
+    seedInput.value = currentSeed;
+
+    function buildSystem() {
+      const elements = [];
+      for (const type of activeElements) {
+        elements.push({ ...elementConfigs[type] });
+      }
+      return {
+        protocol: 'nexart',
+        systemVersion: '0.2',
+        seed: parseInt(seedInput.value) || currentSeed,
+        background: {
+          color: bgColorSelect.value,
+          texture: bgTextureSelect.value
+        },
+        elements,
+        motion: {
+          source: motionSourceSelect.value,
+          speed: parseFloat(motionSpeedInput.value) || 0.3
+        },
+        deterministic: true
+      };
+    }
+
+    function renderFrame(t = 0) {
+      const system = buildSystem();
+      const rand = createPRNG(system.seed);
+
+      ctx.fillStyle = parseColor(system.background.color);
+      ctx.fillRect(0, 0, width, height);
+
+      if (system.background.texture !== 'none') {
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+        const intensity = system.background.texture === 'noise' ? 30 : 15;
+        for (let i = 0; i < data.length; i += 4) {
+          const noise = (rand() - 0.5) * intensity;
+          data[i] += noise; data[i+1] += noise; data[i+2] += noise;
+        }
+        ctx.putImageData(imageData, 0, 0);
+      }
+
+      for (const el of system.elements) {
+        const elRand = createPRNG(system.seed + system.elements.indexOf(el) * 1000);
+        if (el.type === 'flowField') {
+          primitives[el.type](ctx, el, width, height, elRand, system.seed, t);
+        } else {
+          primitives[el.type](ctx, el, width, height, elRand, t);
+        }
+      }
+
+      seedDisplay.textContent = system.seed;
+      utcTime.textContent = new Date().toISOString().split('T')[1].split('.')[0];
+      jsonOutput.textContent = JSON.stringify(system, null, 2);
+    }
+
+    function startAnimation() {
+      if (animationId) cancelAnimationFrame(animationId);
+      const startTime = performance.now();
+      const speed = parseFloat(motionSpeedInput.value) || 0.3;
+      const loop = () => {
+        const elapsed = (performance.now() - startTime) / 1000;
+        const t = motionSourceSelect.value === 'time' ? elapsed * speed : 0;
+        renderFrame(t);
+        animationId = requestAnimationFrame(loop);
+      };
+      animationId = requestAnimationFrame(loop);
+      isAnimating = true;
+      btnToggle.textContent = 'Stop';
+    }
+
+    function stopAnimation() {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+      isAnimating = false;
+      btnToggle.textContent = 'Start';
+    }
+
+    document.querySelectorAll('.element-tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        const type = tag.dataset.type;
+        if (activeElements.has(type)) {
+          activeElements.delete(type);
+          tag.classList.remove('active');
+        } else {
+          activeElements.add(type);
+          tag.classList.add('active');
+        }
+        if (!isAnimating) renderFrame(0);
+      });
+    });
+
+    [bgColorSelect, bgTextureSelect, motionSourceSelect, motionSpeedInput, seedInput].forEach(el => {
+      el.addEventListener('change', () => {
+        if (!isAnimating) renderFrame(0);
+      });
+    });
+
+    btnRandomize.addEventListener('click', () => {
+      currentSeed = Date.now();
+      seedInput.value = currentSeed;
+      if (!isAnimating) renderFrame(0);
+    });
+
+    btnToggle.addEventListener('click', () => {
+      if (isAnimating) stopAnimation();
+      else startAnimation();
+    });
+
+    btnCopy.addEventListener('click', () => {
+      navigator.clipboard.writeText(jsonOutput.textContent);
+      btnCopy.textContent = 'Copied!';
+      setTimeout(() => btnCopy.textContent = 'Copy JSON', 1500);
+    });
+
+    renderFrame(0);
+  </script>
+</body>
+</html>
