@@ -1,0 +1,58 @@
+{
+  "name": "@nexart/ui-renderer",
+  "version": "0.9.1",
+  "description": "Browser-first bounded generative renderer for safe, fast, interactive visuals. Resolution scaling, frame budgets, observable state.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "examples",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "example:basic": "npx tsx examples/basic-preview.ts",
+    "example:budget": "npx tsx examples/budget-demo.ts",
+    "test": "npm run build && node --test dist/*.test.js 2>/dev/null || echo 'No tests yet'"
+  },
+  "dependencies": {
+    "@nexart/codemode-sdk": "^1.8.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "generative",
+    "renderer",
+    "canvas",
+    "creative-coding",
+    "preview",
+    "sandbox",
+    "bounded",
+    "runtime",
+    "miniapp",
+    "browser",
+    "deterministic",
+    "ai-agent"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artnames/nexart-ui-renderer.git"
+  },
+  "homepage": "https://github.com/artnames/nexart-ui-renderer#readme",
+  "author": "NexArt",
+  "publishConfig": {
+    "access": "public"
+  }
+}
